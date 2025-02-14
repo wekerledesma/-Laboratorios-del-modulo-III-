@@ -1,0 +1,146 @@
+comando para realizar la practicas del modulo III
+
+Práctica Completa - Configuración de Red y SSH con Autenticación sin Contraseña
+1️⃣ Configurar el menú de Grub para que el tiempo de espera sea de 20 segundos:
+Editar el archivo de configuración de Grub:
+
+sudo nano /etc/default/grub
+
+Modificar la línea de GRUB_TIMEOUT para que quede así:
+
+GRUB_TIMEOUT=20
+
+Actualizar el archivo de configuración de Grub:
+
+sudo grub2-mkconfig -o /boot/grub2/grub.cfg
+
+Verificamos el resultado del tiempo de espera:
+
+Reiniciamos la máquina y verifica que el tiempo de espera en el menú de Grub es de 20 segundos.
+
+2️⃣ Método de recuperación si se olvida la contraseña de root:
+Si olvidas la contraseña de root, puedes recuperarla de la siguiente manera:
+
+Reinicia la máquina y accede al menú de Grub.
+Edita las opciones de arranque:
+En el menú de Grub, selecciona la opción de arranque y presiona e para editar.
+Encuentra la línea que comienza con linux y agrega al final single para iniciar en modo de usuario único.
+Inicia en modo de usuario único y restablece la contraseña de root:
+
+passwd root
+
+Escribe y confirma la nueva contraseña.
+
+Reinicia el sistema:
+
+reboot
+
+3️⃣ Crear un script para hacer un backup de la carpeta /home/(tu_usuario) utilizando tar:
+Crea un script llamado backup_home.sh:
+
+nano ~/backup_home.sh
+
+Escribe el siguiente contenido en el script:
+
+#!/bin/bash
+fecha=$(date +"%d-%m-%Y:%H:%M")
+tar -czf ~/backup_$fecha.tar.gz /home/$(whoami)
+echo "Backup creado: backup_$fecha.tar.gz"
+
+Haz el script ejecutable:
+
+chmod +x ~/backup_home.sh
+
+Ejecuta el script para crear el backup:
+
+~/backup_home.sh
+
+4️⃣ Crear un script para copiar el resultado de ifconfig a un archivo en el escritorio:
+Crea un script llamado copiar_ifconfig.sh:
+
+nano ~/copiar_ifconfig.sh
+
+Escribe el siguiente contenido en el script:
+
+#!/bin/bash
+echo "Ingrese el nombre del archivo:"
+read nombre
+ifconfig > ~/Escritorio/$nombre.txt
+echo "Archivo creado en el escritorio: $nombre.txt"
+
+Haz el script ejecutable:
+
+chmod +x ~/copiar_ifconfig.sh
+
+Ejecuta el script para generar el archivo:
+
+~/copiar_ifconfig.sh
+Te pedirá que ingreses el nombre del archivo y luego generará el archivo con el resultado de ifconfig.
+
+5️⃣ Configurar la VM en modo Bridge y verificar la conectividad con el host mediante ping:
+Configura la red de la VM en modo Bridge en VMware.
+
+Verifica la IP de la VM:
+
+ip a
+En el host (Windows), verifica la conectividad con la VM usando ping:
+Abre PowerShell o CMD en Windows y ejecuta:
+
+powershell
+
+ping 192.168.1.34
+Asegúrate de que la VM y el host se puedan comunicar.
+
+6️⃣ Habilitar el servicio SSH y probar la conexión desde Windows:
+Habilita el servicio SSH en CentOS:
+
+sudo systemctl enable sshd
+sudo systemctl start sshd
+Verifica que SSH esté corriendo:
+
+sudo systemctl status sshd
+En la máquina host (Windows), prueba la conexión SSH:
+Desde PowerShell o CMD:
+
+powershell
+
+ssh weker@192.168.1.34
+Debería pedirte la contraseña de weker (si no has configurado la autenticación sin contraseña).
+
+7️⃣ Generar un par de llaves SSH en Windows (si no lo has hecho ya):
+Genera las llaves SSH en Windows:
+powershell
+
+ssh-keygen -t rsa -b 4096
+
+Cuando te pregunte por la ubicación, presiona Enter para usar la predeterminada C:\Users\TuUsuario\.ssh\id_rsa.
+Deja la passphrase en blanco.
+
+8️⃣ Copiar la clave pública a CentOS:
+Copia la clave pública desde Windows a CentOS:
+
+scp $env:USERPROFILE\.ssh\id_rsa.pub weker@192.168.1.34:~/.ssh/authorized_keys
+(Esto copiará la clave pública directamente al archivo authorized_keys en CentOS).
+
+En CentOS, asegúrate de que el archivo authorized_keys contenga la clave:
+
+cat ~/.ssh/authorized_keys
+
+9️⃣ Ajustar los permisos en CentOS:
+Asegúrate de que los permisos del directorio .ssh y el archivo authorized_keys sean correctos:
+
+chmod 700 ~/.ssh
+chmod 600 ~/.ssh/authorized_keys
+
+🔟 Reiniciar el servicio SSH en CentOS:
+Reinicia el servicio SSH para que se apliquen los cambios:
+
+sudo systemctl restart sshd
+
+1️⃣1️⃣ Probar la conexión SSH sin contraseña desde Windows:
+Desde Windows PowerShell, intenta conectarte a la VM:
+
+powershell
+ssh weker@192.168.1.34
+
+Si todo está configurado correctamente, deberías entrar sin que te pida la contraseña.
